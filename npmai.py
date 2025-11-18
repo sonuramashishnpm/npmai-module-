@@ -1,3 +1,4 @@
+
 from langchain_core.language_models.llms import LLM
 from typing import Any, List, Optional
 from selenium import webdriver
@@ -56,226 +57,120 @@ class GeminiAIMode(LLM):
 
 #2.Gemini
 class Gemini(LLM):
+    driver: Optional[webdriver.Chrome] = None
     @property
     def _llm_type(self) -> str:
         return "gemini_ai_web_llm"
+    def __init__(self,**kwargs:Any):
+        super().__init__(**kwargs)
+        options = Options()
+        options.add_argument("--incognito")
+        options.add_argument("--disable-blink-features=AutomationControlled")
+        options.add_experimental_option("excludeSwitches", ["enable-automation"])
+        options.add_experimental_option('useAutomationExtension', False)
+
+        self.driver = webdriver.Chrome(options=options)
+        self.driver.execute_cdp_cmd("Page.addScriptToEvaluateOnNewDocument", {
+            "source": "Object.defineProperty(navigator, 'webdriver', { get: () => undefined })"
+        })
+
+        self.driver.get("https://gemini.google.com/app")
+        self.driver.maximize_window()
+        time.sleep(5)
 
     def _call(self, prompts: str, stop: Optional[List[str]] = None) -> str:
-        driver = None
         try:
-            cond1 = input("Do you want to chat continuously or only one prompt and response? (C for continuous / O for one): ").strip().upper()
-
-            # ---------------- CONTINUOUS CHAT ----------------
-            if cond1 == "C":
-                options = Options()
-                options.add_argument("--incognito")
-                options.add_argument("--disable-blink-features=AutomationControlled")
-                options.add_experimental_option("excludeSwitches", ["enable-automation"])
-                options.add_experimental_option('useAutomationExtension', False)
-
-                driver = webdriver.Chrome(options=options)
-                driver.execute_cdp_cmd("Page.addScriptToEvaluateOnNewDocument", {
-                    "source": "Object.defineProperty(navigator, 'webdriver', { get: () => undefined })"
-                })
-
-                driver.get("https://gemini.google.com/app")
-                driver.maximize_window()
-                time.sleep(5)
-
-                while True:
-                    user_prompt = input("\nYou: ").strip()
-                    if user_prompt.lower() == "exit":
-                        print("Chat ended.")
-                        break
-
-                    prompt_box = driver.find_element(
-                        By.XPATH,
-                        "/html/body/chat-app/main/side-navigation-v2/bard-sidenav-container/"
-                        "bard-sidenav-content/div[2]/div/div[2]/chat-window/div/input-container/"
-                        "div/input-area-v2/div/div/div[2]/div/div/rich-textarea/div[1]"
-                    )
-                    prompt_box.send_keys(user_prompt)
-                    prompt_box.send_keys(Keys.RETURN)
-
-                    time.sleep(20)
-                    responses = driver.find_elements(By.XPATH, "//model-response//response-container//div/div[2]/div[2]")
-                    if responses:
-                        print("Gemini:", responses[-1].text.strip())
-
-                return "Chat session ended."
-
-            # ---------------- ONE-TIME QUERY ----------------
-            elif cond1 == "O":
-                options = Options()
-                options.add_argument("--incognito")
-                options.add_argument("--disable-blink-features=AutomationControlled")
-                options.add_experimental_option("excludeSwitches", ["enable-automation"])
-                options.add_experimental_option('useAutomationExtension', False)
-
-                driver = webdriver.Chrome(options=options)
-                driver.execute_cdp_cmd("Page.addScriptToEvaluateOnNewDocument", {
-                    "source": "Object.defineProperty(navigator, 'webdriver', { get: () => undefined })"
-                })
-
-                driver.get("https://gemini.google.com/app")
-                driver.maximize_window()
-                time.sleep(5)
-
-                prompt_box = driver.find_element(
-                    By.XPATH,
-                    "/html/body/chat-app/main/side-navigation-v2/bard-sidenav-container/"
-                    "bard-sidenav-content/div[2]/div/div[2]/chat-window/div/input-container/"
-                    "div/input-area-v2/div/div/div[2]/div/div/rich-textarea/div[1]"
+            prompt_box = self.driver.find_element(
+                By.XPATH,
+                "/html/body/chat-app/main/side-navigation-v2/bard-sidenav-container/"
+                "bard-sidenav-content/div[2]/div/div[2]/chat-window/div/input-container/"
+                "div/input-area-v2/div/div/div[2]/div/div/rich-textarea/div[1]"
                 )
-                prompt_box.send_keys(prompts)
-                prompt_box.send_keys(Keys.RETURN)
-                time.sleep(15)
+            prompt_box.clear()
+            prompt_box.send_keys(prompts)
+            prompt_box.send_keys(Keys.RETURN)
 
-                result = driver.find_element(
-                    By.XPATH,
-                    "//chat-window-content//model-response[last()]//response-container/div/div[2]/div[2]"
-                )
-                return result.text.strip()
-
-           
+            time.sleep(20)
+            responses = self.driver.find_elements(By.XPATH, "//model-response//response-container//div/div[2]/div[2]")
+            if responses:
+                print(responses[-1].text.strip())
             else:
                 return "Invalid input. Please enter 'C' or 'O'."
 
         except Exception as e:
             return f"[Error in Gemini: {str(e)}]"
 
-        finally:
-            if driver:
-                try:
-                    driver.quit()
-                except:
-                    pass
+       
 
     def invoke(self, prompts: str) -> str:
         return self._call(prompts)
-
-   
-
+    def close(self):
+        if self.driver:
+            self.driver.quit()
+            self.driver=None
 
 #3.ChatGPT
 class ChatGPT(LLM):
+    driver: Optional[webdriver.Chrome] = None
     @property
     def _llm_type(self) -> str:
         return "chatgpt_web_llm"
 
-    def _call(self, prompts: str, stop: Optional[List[str]] = None) -> str:
-        driver = None
+    def __init__(self,**kwargs:Any):
+        super().__init__(**kwargs)
+        options = Options()
+        options.add_argument("--incognito")
+        options.add_argument("--disable-blink-features=AutomationControlled")
+        options.add_experimental_option("excludeSwitches", ["enable-automation"])
+        options.add_experimental_option('useAutomationExtension', False)
+
+        self.driver = webdriver.Chrome(options=options)
+        self.driver.execute_cdp_cmd("Page.addScriptToEvaluateOnNewDocument", {
+            "source": "Object.defineProperty(navigator, 'webdriver', { get: () => undefined })"
+        })
+        self.driver.get("https://chatgpt.com/")
+        self.driver.maximize_window()
+        time.sleep(7)
+
+    def _call(self, prompts: str, stop: Optional[List[str]] = None) -> str:    
         try:
-            cond1 = input("Do you want to chat continuously or only one prompt and response? (C for continuous / O for one): ")
+            try:
+                cookies = self.driver.find_element(By.XPATH, "/html/body/div[1]/div[2]/div/div[2]/button[3]")
+                cookies.click()
+                time.sleep(2)
+            except:
+                pass
 
-            if cond1 == "C":
-                # Continuous chatting
-                options = Options()
-                options.add_argument("--incognito")
-                options.add_argument("--disable-blink-features=AutomationControlled")
-                options.add_experimental_option("excludeSwitches", ["enable-automation"])
-                options.add_experimental_option('useAutomationExtension', False)
+            prompt_box = self.driver.find_element(By.XPATH,"/html/body/div[1]/div[1]/div/div/main/div/div/div[2]/div[1]/div/div/div[2]/form/div[2]/div/div[1]/div/div")
+            time.sleep(2)
+            prompt_box.clear()
+            prompt_box.send_keys(prompts)
+            time.sleep(2.5)
+            prompt_box.send_keys(Keys.RETURN)
+            time.sleep(23)
+            try:
+                login_pop = self.driver.find_element(By.XPATH, "/html/body/div[4]/div/div/div/div/div/a")
+                if login_pop:
+                    login_pop.click()
+            except:
+                pass
 
-                driver = webdriver.Chrome(options=options)
-                driver.execute_cdp_cmd("Page.addScriptToEvaluateOnNewDocument", {
-                    "source": "Object.defineProperty(navigator, 'webdriver', { get: () => undefined })"
-                })
-                driver.get("https://chatgpt.com/")
-                driver.maximize_window()
-                time.sleep(7)
-
-                try:
-                    cookies = driver.find_element(By.XPATH, "/html/body/div[1]/div[2]/div/div[2]/button[3]")
-                    cookies.click()
-                    time.sleep(2)
-                except:
-                    pass
-
-                while True:
-                    extra_prompt = input("Enter your query (or type 'exit' to stop): ")
-                    if extra_prompt.lower() == "exit":
-                        break
-
-                    prompt_box = driver.find_element(
-                        By.XPATH,
-                        "/html/body/div[1]/div[1]/div/div/main/div/div/div[2]/div[1]/div/div/div[2]/form/div[2]/div/div[1]/div/div"
-                    )
-                    time.sleep(2)
-                    prompt_box.clear()
-                    prompt_box.send_keys(extra_prompt)
-                    time.sleep(2.5)
-                    prompt_box.send_keys(Keys.RETURN)
-                    time.sleep(23)
-
-                    try:
-                        login_pop = driver.find_element(By.XPATH, "/html/body/div[4]/div/div/div/div/div/a")
-                        if login_pop:
-                            login_pop.click()
-                    except:
-                        pass
-
-                    response = driver.find_elements(By.XPATH, "//main//article")
-                    if response:
-                        final_response = response[-1]
-                        print(final_response.text)
-
-                return "Chat session ended."
-
-            elif cond1 == "O":
-                # One-time query
-                options = Options()
-                options.add_argument("--incognito")
-                options.add_argument("--disable-blink-features=AutomationControlled")
-                options.add_experimental_option("excludeSwitches", ["enable-automation"])
-                options.add_experimental_option('useAutomationExtension', False)
-
-                driver = webdriver.Chrome(options=options)
-                driver.execute_cdp_cmd("Page.addScriptToEvaluateOnNewDocument", {
-                    "source": "Object.defineProperty(navigator, 'webdriver', { get: () => undefined })"
-                })
-
-                url = "https://chatgpt.com/"
-                driver.maximize_window()
-                driver.get(url)
-                time.sleep(7)
-
-                try:
-                    cookies = driver.find_element(By.XPATH, "/html/body/div[1]/div[2]/div/div[2]/button[3]")
-                    cookies.click()
-                    time.sleep(2)
-                except:
-                    pass
-
-                prompt_box = driver.find_element(
-                    By.XPATH,
-                    "/html/body/div[1]/div[1]/div/div/main/div/div/div[2]/div[1]/div/div/div[2]/form/div[2]/div/div[1]/div/div"
-                )
-                prompt_box.send_keys(prompts)
-                time.sleep(2.5)
-                prompt_box.send_keys(Keys.RETURN)
-                time.sleep(10)
-
-                result = driver.find_element(
-                    By.XPATH,
-                    "/html/body/div[1]/div/div/div/main/div/div/div[1]/div/div/div[2]/article[2]"
-                )
-                return result.text
-
+            response = self.driver.find_elements(By.XPATH, "//main//article")
+            if response:
+                final_response = response[-1]
+                print(final_response.text)
             else:
-                return "Invalid input. Please enter 'C' or 'O'."
+                print("Invalid input. Please enter 'C' or 'O'.")
 
         except Exception as e:
             return f"[Error in ChatGPT: {str(e)}]"
 
-        finally:
-            if driver:
-                try:
-                    driver.quit()
-                except:
-                    pass
-
     def invoke(self, prompts: str) -> str:
         return self._call(prompts)
+    def close(self):
+        if self.driver:
+            self.driver.quit()
+            self.driver=None
 #4.Grok
 class Grok(LLM):
     @property
@@ -376,7 +271,7 @@ class Perplexity(LLM):
 # Call Code
 if __name__ == "__main__":
     models = {"1": GeminiAIMode, "2": Gemini, "3": ChatGPT, "4":Grok, "5":Perplexity}
-    choice = input("Choose model 1-5: ").strip()
+    choice = input("Choose model 1:-GeminiAIMode,2:-Gemini, 3:-ChatGPT, 4:-Grok, 5:-Perplexity ").strip()
     prompts = input("Enter query: ").strip()
     Selected = models.get(choice, Gemini)
     llm = Selected()
