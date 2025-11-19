@@ -93,7 +93,7 @@ class Gemini(LLM):
             time.sleep(20)
             responses = self.driver.find_elements(By.XPATH, "//model-response//response-container//div/div[2]/div[2]")
             if responses:
-                print(responses[-1].text.strip())
+                return responses[-1].text.strip()
             else:
                 return "Invalid input. Please enter 'C' or 'O'."
 
@@ -158,7 +158,7 @@ class ChatGPT(LLM):
             response = self.driver.find_elements(By.XPATH, "//main//article")
             if response:
                 final_response = response[-1]
-                print(final_response.text)
+                return final_response.text
             else:
                 print("Invalid input. Please enter 'C' or 'O'.")
 
