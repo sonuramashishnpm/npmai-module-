@@ -16,7 +16,9 @@ Supports continuous conversation mode for long-running interactions with ChatGPT
 
 Encourages responsible usage—please respect AI companies like OpenAI, Google, X AI, Perplexity, and support them if used at scale.
 
-⚙️ Installation pip install npmai
+⚙️ Installation
+pip install npmai
+
 
 Tip: For Python 3.13, make sure to use:
 
@@ -26,15 +28,21 @@ py -3.13 -m pip install npmai
 
 Import the models you need—either one, two, or all:
 
-from npmai import ChatGPT, Grok, Perplexity, Gemini, GeminiAIMode
+from npmai import ChatGPT, Grok, Perplexity, Gemini, GeminiAIMode,Image
+
 
 Initialize a model:
 
-llm = ChatGPT() # or Gemini(), Grok(), Perplexity()
+llm = ChatGPT()       # or Gemini(), Grok(), Perplexity(),Image()
+
 
 Invoke a prompt and get the response:
 
-response = llm.invoke("Your prompt here") print(response)
+response = llm.invoke("Your prompt here")
+print(response) 
+
+#Latest Update :
+version 0.0.5 Here you will get models that can generate Images also.
 
 ⚠️ Important Notes
 
