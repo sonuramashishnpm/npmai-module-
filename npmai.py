@@ -7,6 +7,16 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import time
+import json
+import re
+import subprocess
+
+def get_chrome_major_version():
+    out = subprocess.check_output(
+        r'reg query "HKEY_CURRENT_USER\Software\Google\Chrome\BLBeacon" /v version'
+    ).decode()
+    version = re.search(r"(\d+)\.", out).group(1)
+    return int(version)
 
 PromptType = Union[str, List[str], dict]
 
@@ -30,6 +40,7 @@ class GeminiAIMode(LLM):
             driver = uc.Chrome(
                 options=options,
                 headless=False,
+                version_main=get_chrome_major_version()
                 )
             driver.execute_cdp_cmd("Page.addScriptToEvaluateOnNewDocument", {
                 "source": "Object.defineProperty(navigator, 'webdriver', { get: () => undefined })"
@@ -89,6 +100,7 @@ class Gemini(LLM):
         self.driver = uc.Chrome(
             options=options,
             headless=False,
+            version_main=get_chrome_major_version()
             )
         self.driver.execute_cdp_cmd("Page.addScriptToEvaluateOnNewDocument", {
             "source": "Object.defineProperty(navigator, 'webdriver', { get: () => undefined })"
@@ -157,6 +169,7 @@ class ChatGPT(LLM):
         self.driver = uc.Chrome(
             options=options,
             headless=False,
+            version_main=get_chrome_major_version()
             )
         self.driver.execute_cdp_cmd("Page.addScriptToEvaluateOnNewDocument", {
             "source": "Object.defineProperty(navigator, 'webdriver', { get: () => undefined })"
@@ -237,6 +250,7 @@ class Grok(LLM):
             driver = uc.Chrome(
                 options=options,
                 headless=False,
+                version_main=get_chrome_major_version()
                 )
             driver.execute_cdp_cmd("Page.addScriptToEvaluateOnNewDocument", {
                 "source": "Object.defineProperty(navigator, 'webdriver', { get: () => undefined })"
@@ -304,6 +318,7 @@ class Perplexity(LLM):
             driver = uc.Chrome(
                 options=options,
                 headless=False,
+                version_main=get_chrome_major_version()
                 )
             driver.execute_cdp_cmd("Page.addScriptToEvaluateOnNewDocument", {
                 "source": "Object.defineProperty(navigator, 'webdriver', { get: () => undefined })"
@@ -365,6 +380,7 @@ class Image(LLM):
             driver=uc.Chrome(
                 options=options,
                 headless=False,
+                version_main=get_chrome_major_version()
                 )
             driver.execute_cdp_cmd("Page.addScriptToEvaluateOnNewDocument",{
                 "source":"Object.defineProperty(navigator,'webdriver',{get:() => undefined })"
@@ -421,6 +437,7 @@ class Mistral(LLM):
             driver = uc.Chrome(
                 options=options,
                 headless=False,
+                version_main=get_chrome_major_version()
                 )
             driver.execute_cdp_cmd("Page.addScriptToEvaluateOnNewDocument", {
                 "source": "Object.defineProperty(navigator, 'webdriver', { get: () => undefined })"
