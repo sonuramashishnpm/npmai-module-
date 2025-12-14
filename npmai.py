@@ -336,8 +336,8 @@ class Perplexity(LLM):
             prompt.send_keys(Keys.RETURN)
             time.sleep(30)
 
-            result = driver.find_element(By.XPATH,"/html/body/main/div[1]/div/div/div[2]/div/div[1]/div[1]/div/div[2]/div/div[2]/div/div/div/div/div/div[2]")
-            time.sleep(3)                         
+            result = driver.find_element(By.XPATH,"//*[@id='markdown-content-0']/div")
+            time.sleep(3)                          #/html/body/main/div[1]/div/div/div[2]/div/div[1]/div[1]/div[3]/div/div[1]/div/div[2]/div/div/div/div/div/div[2]/div[1]/div/div[1]/div/div/div[1]/div/div/div                  
             return result.text
 
         except Exception as e:
