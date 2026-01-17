@@ -18,7 +18,7 @@ class LLMRequest(BaseModel):
 Model_in_Use=[]
 
 Model_links = {
-    "llama3.2": "https://proposals-ken-strikes-preparing.trycloudflare.com/llm" ,
+    "llama3.2": "https://surrey-representations-intensity-node.trycloudflare.com/llm" ,
     "codellama:7b-instruct":"",
     "gemma2:9b":"",
     "mistral:7b":"",
@@ -34,7 +34,7 @@ Model_links = {
 
 @app.post("/llm")
 async def handler(data: LLMRequest):
-    if len(data.prompt) >= 16000:
+    if len(data.prompt) >= 20000:
         raise HTTPException(400, "Prompt too long")
 
     if data.model not in Model_links:
