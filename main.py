@@ -18,16 +18,16 @@ class LLMRequest(BaseModel):
 Model_in_Use=[]
 
 Model_links = {
-    "llama3.2": "https://influences-shoe-installing-written.trycloudflare.com/llm" ,
-    "codellama:7b-instruct":"https://influences-shoe-installing-written.trycloudflare.com/llm",
-    "gemma2:9b":"https://influences-shoe-installing-written.trycloudflare.com/llm",
-    "mistral:7b":"https://influences-shoe-installing-written.trycloudflare.com/llm",
-    "qwen2.5-coder:7b":"https://influences-shoe-installing-written.trycloudflare.com/llm",
-    "phi3:medium":"https://influences-shoe-installing-written.trycloudflare.com/llm",
-    "falcon:7b-instruct":"https://influences-shoe-installing-written.trycloudflare.com/llm",
-    "maxkb/baichuan2:13b-chat":"https://influences-shoe-installing-written.trycloudflare.com/llm",
-    "internlm2:7b":"https://influences-shoe-installing-written.trycloudflare.com/llm",
-    "vicuna:7b":"https://influences-shoe-installing-written.trycloudflare.com/llm",
+    "llama3.2": "https://swimming-large-wedding-conscious.trycloudflare.com/llm" ,
+    "codellama:7b-instruct":"https://swimming-large-wedding-conscious.trycloudflare.com/llm",
+    "gemma2:9b":"https://swimming-large-wedding-conscious.trycloudflare.com/llm",
+    "mistral:7b":"https://swimming-large-wedding-conscious.trycloudflare.com/llm",
+    "qwen2.5-coder:7b":"https://swimming-large-wedding-conscious.trycloudflare.com/llm",
+    "phi3:medium":"https://swimming-large-wedding-conscious.trycloudflare.com/llm",
+    "falcon:7b-instruct":"https://swimming-large-wedding-conscious.trycloudflare.com/llm",
+    "maxkb/baichuan2:13b-chat":"https://swimming-large-wedding-conscious.trycloudflare.com/llm",
+    "internlm2:7b":"https://swimming-large-wedding-conscious.trycloudflare.com/llm",
+    "vicuna:7b":"https://swimming-large-wedding-conscious.trycloudflare.com/llm",
 }
 
 
